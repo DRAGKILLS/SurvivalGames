@@ -1,0 +1,10 @@
+name: SurvivalGames
+main: DRAGKILLS\SurvivalGames
+api: [3.0.0]
+version: 1.0
+authors: [DRAGKILLS]
+
+permissions:
+  sg.admin:
+    default: op
+    description: Allow Player to create/edit SurvivalGames arena

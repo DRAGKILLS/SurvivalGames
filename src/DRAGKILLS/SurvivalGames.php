@@ -35,21 +35,62 @@ declare(strict_types=1);
 namespace DRAGKILLS;
 
 
+use DRAGKILLS\arena\SG;
+use DRAGKILLS\commands\SGCommands;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerChatEvent;
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use function in_array;
 
 /**
  * Class SurvivalGames
  * @package DRAGKILLS
  */
-class SurvivalGames extends PluginBase
+class SurvivalGames extends PluginBase implements Listener
 {
 
+    /** @var SG[] $arenas */
     public $arenas = [];
 
-    public function onEnable()
+    /** @var SG[] $editors */
+    public $editors = [];
+
+    public function onEnable(): void
     {
-        $this->getServer()->getPluginManager()->registerEvents(new SGListener($this));
+        $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->getServer()->getCommandMap()->register("SG_v1", new SGCommands($this));
         $this->getLogger()->alert("Enabled By DRAGKILLS");
+    }
+
+    public function set(Player $player, $arena): void
+    {
+        $this->editors[$player->getName()] = $this->arenas[$arena];
+        $player->sendMessage("You are now in setup mode\ntype /.help to get list of help");
+    }
+
+    public function onChat(PlayerChatEvent $event)
+    {
+        $player = $event->getPlayer();
+        $message = $event->getMessage();
+        if(!isset($this->editors[$player->getName()])){
+            return false;
+        }
+        $event->setCancelled(true);
+        switch($message){
+            case "/.help":
+                $player->sendMessage("SurvivalGames SetUP:\n/.mode <team : solo>\n/.maxplayers <num, [max players]>/.done\n/.spawn <num, 1,2,3...>\n>");
+                break;
+            case "/.mode":
+                echo "not now";
+                break;
+            case "/.maxplayers":
+                if(is_numeric($message[1])){
+                    $this->editors[$player->getName()]->setMaxPlayers($message[1]);
+                } else {
+                    $player->sendMessage("type numeric");
+                }
+                break;
+        }
     }
 }

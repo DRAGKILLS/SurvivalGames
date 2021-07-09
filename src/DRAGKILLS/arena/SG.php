@@ -35,7 +35,9 @@ declare(strict_types=1);
 namespace DRAGKILLS\arena;
 
 
+use DRAGKILLS\SurvivalGames;
 use pocketmine\event\Listener;
+use pocketmine\level\Level;
 
 /**
  * Class SG
@@ -44,4 +46,38 @@ use pocketmine\event\Listener;
 class SG implements Listener
 {
 
+    /**
+     * @var SurvivalGames
+     */
+    public $plugin;
+    /**
+     * @var Level
+     */
+    public $level;
+    /**
+     * @var string[]
+     */
+    public $data;
+
+    public function __construct(SurvivalGames $plugin, Level $level, array $arenaData)
+    {
+        $this->plugin = $plugin;
+        $this->level = $level;
+        if(empty($arenaData)){
+            $this->createData();
+        }
+    }
+
+    public function setMaxPlayers(int $maxPlayers)
+    {
+        $this->data["maxplayers"] = $maxPlayers;
+    }
+
+    private function createData()
+    {
+        $this->data = [
+            "level" => $this->level,
+            "maxplayers" => 20
+        ];
+    }
 }

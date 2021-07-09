@@ -35,9 +35,11 @@ declare(strict_types=1);
 namespace DRAGKILLS\commands;
 
 
+use DRAGKILLS\arena\SG;
 use DRAGKILLS\SurvivalGames;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
+use pocketmine\Player;
 
 /**
  * Class SGCommands
@@ -67,6 +69,60 @@ class SGCommands extends PluginCommand
         }
         switch(strtolower($args[0])){
             case "help":
+                $sender->sendMessage("SurvivalGames command:\n/{$commandLabel} help : get list of commands\n/{$commandLabel} create : create new SurvivalGames arena\n/{$commandLabel} delete : delete SurvivalGames arena\n/{$commandLabel} set : setup SurvivalGames arena\n/{$commandLabel} about");
+                break;
+            case "about":
+                $sender->sendMessage("By DRAGKILLS\ngithub : https://github.com/DRAGKILLS\nDiscord : DRAGKILLS#0830\nDiscord Server : https://discord.gg/ab9qEQmCya");
+                break;
+            case "create":
+                if($sender instanceof Player){
+                    if(!isset($args[1])){
+                        $sender->sendMessage("you dont type arena name!");
+                        return false;
+                    }
+                    if(!$this->plugin->getServer()->isLevelGenerated($args[1])){
+                        $sender->sendMessage("{$args[1]} is not level/world!");
+                        return false;
+                    }
+                    if(isset($this->plugin->arenas[$args[1]])){
+                        $sender->sendMessage("arena {$args[1]} is already exist!");
+                        return false;
+                    }
+                    $level = $this->plugin->getServer()->getLevelByName($args[1]);
+                    $this->plugin->arenas[$args[1]] = new SG($this->plugin, $level, []);
+                } else {
+                    $sender->sendMessage("Only IN_GAME");
+                }
+                break;
+            case "delete":
+            case "remove":
+            case "rm":
+                if($sender instanceof Player){
+                    if(!isset($args[1])){
+                        $sender->sendMessage("you dont type arena name!");
+                        return false;
+                    }
+                    if(!isset($this->plugin->arenas[$args[1]])) {
+                        $sender->sendMessage("arena {$args[1]} is not arena!");
+                        return false;
+                    }
+                    unset($this->plugin->arenas[$args[1]]);
+                    unlink($this->plugin->getDataFolder() . "maps/" . $args[1] . ".zip");
+                    unlink($this->plugin->getDataFolder() . "arenas/" . $args[1] . ".yml");
+                } else {
+                    $sender->sendMessage("Only IN_GAME");
+                }
+                break;
+            case "set":
+                if($sender instanceof Player){
+                    if(!isset($args[1])){
+                        $sender->sendMessage("do /{$commandLabel} set (arena)}");
+                        return false;
+                    }
+                    $this->plugin->set($sender, $args[1]);
+                } else {
+                    $sender->sendMessage("Only IN_GAME");
+                }
                 break;
             default:
                 $sender->sendMessage("do /{$commandLabel} help for get list off commands");

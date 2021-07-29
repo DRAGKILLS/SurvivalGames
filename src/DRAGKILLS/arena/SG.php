@@ -59,7 +59,7 @@ class SG implements Listener
      */
     public $data;
 
-    public function __construct(SurvivalGames $plugin, Level $level, array $arenaData)
+    public function __construct(SurvivalGames $plugin, Level $level)
     {
         $this->plugin = $plugin;
         $this->level = $level;

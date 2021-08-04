@@ -65,7 +65,11 @@ class SGCommands extends PluginCommand
     {
         if(!isset($args[0])){
             $sender->sendMessage("do /{$commandLabel} help for get list off commands");
-            return false;
+            return;
+        }
+        if(!$sender->hasPermission("sg.admin")){
+            $sender->sendMessage("§cYou dont have permission to use this command");
+            return;
         }
         switch(strtolower($args[0])){
             case "help":
@@ -78,15 +82,15 @@ class SGCommands extends PluginCommand
                 if($sender instanceof Player){
                     if(!isset($args[1])){
                         $sender->sendMessage("you dont type arena name!");
-                        return false;
+                        return;
                     }
                     if(!$this->plugin->getServer()->isLevelGenerated($args[1])){
                         $sender->sendMessage("{$args[1]} is not level/world!");
-                        return false;
+                        return;
                     }
                     if(isset($this->plugin->arenas[$args[1]])){
                         $sender->sendMessage("arena {$args[1]} is already exist!");
-                        return false;
+                        return;
                     }
                     $level = $this->plugin->getServer()->getLevelByName($args[1]);
                     $this->plugin->arenas[$args[1]] = new SG($this->plugin, $level, []);
@@ -100,11 +104,11 @@ class SGCommands extends PluginCommand
                 if($sender instanceof Player){
                     if(!isset($args[1])){
                         $sender->sendMessage("you dont type arena name!");
-                        return false;
+                        return;
                     }
                     if(!isset($this->plugin->arenas[$args[1]])) {
                         $sender->sendMessage("arena {$args[1]} is not arena!");
-                        return false;
+                        return;
                     }
                     unset($this->plugin->arenas[$args[1]]);
                     unlink($this->plugin->getDataFolder() . "maps/" . $args[1] . ".zip");
@@ -117,7 +121,7 @@ class SGCommands extends PluginCommand
                 if($sender instanceof Player){
                     if(!isset($args[1])){
                         $sender->sendMessage("do /{$commandLabel} set (arena)}");
-                        return false;
+                        return;
                     }
                     $this->plugin->set($sender, $args[1]);
                 } else {

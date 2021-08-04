@@ -69,6 +69,11 @@ class SurvivalGames extends PluginBase implements Listener
         $player->sendMessage("You are now in setup mode\ntype /.help to get list of help");
     }
 
+    public function getArenaFile($path): Config
+    {
+        return new Config($this->getDataFolder()."arenas/{$path}.yml");
+    }
+
     public function onChat(PlayerChatEvent $event)
     {
         $player = $event->getPlayer();

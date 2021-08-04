@@ -63,21 +63,12 @@ class SG implements Listener
     {
         $this->plugin = $plugin;
         $this->level = $level;
-        if(empty($arenaData)){
-            $this->createData();
-        }
+        $arenaFileData = $plugin->getArenaFile($plugin->getDataFolder()."arenas/".$level->getFolderName().".yml");
+        $this->data = $arenaFileData->getAll(\false);
     }
 
     public function setMaxPlayers(int $maxPlayers)
     {
         $this->data["maxplayers"] = $maxPlayers;
-    }
-
-    private function createData()
-    {
-        $this->data = [
-            "level" => $this->level,
-            "maxplayers" => 20
-        ];
     }
 }

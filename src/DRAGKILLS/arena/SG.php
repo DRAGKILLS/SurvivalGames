@@ -63,7 +63,7 @@ class SG implements Listener
     {
         $this->plugin = $plugin;
         $this->level = $level;
-        $arenaFileData = $plugin->getArenaFile($plugin->getDataFolder()."arenas/".$level->getFolderName().".yml");
+        $arenaFileData = $plugin->getArenaFile($level->getFolderName());
         $this->data = $arenaFileData->getAll(\false);
     }
 

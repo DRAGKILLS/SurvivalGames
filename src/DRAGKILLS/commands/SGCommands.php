@@ -69,7 +69,7 @@ class SGCommands extends PluginCommand
         }
         if(!$sender->hasPermission("sg.admin")){
             switch(strtolower($args[0]){
-                case "join";
+                case "join":
                     if(!isset($args[1])){
                         $sender->sendMessage("do /{$commandLabel} join (arenaName)");
                         return;
@@ -92,7 +92,7 @@ class SGCommands extends PluginCommand
             return;
         }
         switch(strtolower($args[0])){
-	case "join";
+	case "join":
             if(!isset($args[1])){
                 $sender->sendMessage("do /{$commandLabel} join (arenaName)");
                 return;

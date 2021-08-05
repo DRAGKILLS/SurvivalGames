@@ -71,7 +71,7 @@ class SurvivalGames extends PluginBase implements Listener
 
     public function getArenaFile($path): Config
     {
-        return new Config($this->getDataFolder()."arenas/{$path}.yml");
+        return new Config($this->getDataFolder()."arenas/{$path}.yml", Config::YAML);
     }
 
     public function onChat(PlayerChatEvent $event)

@@ -40,6 +40,7 @@ use DRAGKILLS\commands\SGCommands;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\Player;
+use pocketmine\utils\Config;
 use pocketmine\plugin\PluginBase;
 use function in_array;
 
@@ -58,6 +59,19 @@ class SurvivalGames extends PluginBase implements Listener
 
     public function onEnable(): void
     {
+	@mkdir($this->getDataFolder(), 0777, true);
+	if(!is_dir($this->getDataFolder()."arenas")){
+	    @mkdir($this->getDataFolder()."arenas");
+	}
+	if(!is_dir($this->getDataFolder()."maps")){
+	    @mkdir($this->getDataFolder()."maps");
+	}
+	foreach(glob($this->getDataFolder()."arenas/*.yml") as $arenasFile){
+	     $arenaName = basename($arenaFile, ".yml");
+	     if(!isset($this->arenas[$arenaName])){
+		 $this->arenas[$arenaName] = new SG($)÷1
+	     }
+	}
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         $this->getServer()->getCommandMap()->register("SG_v1", new SGCommands($this));
         $this->getLogger()->alert("Enabled By DRAGKILLS");
@@ -74,7 +88,7 @@ class SurvivalGames extends PluginBase implements Listener
         return new Config($this->getDataFolder()."arenas/{$path}.yml", Config::YAML);
     }
 
-    public function getPlayerArena(Player $player): Arena
+    public function getPlayerArena(Player $player): SG
     {
 	return $this->arenas[$player->getLevel()->getFolderName()];
     }

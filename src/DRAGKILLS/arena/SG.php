@@ -63,8 +63,8 @@ class SG implements Listener
     {
         $this->plugin = $plugin;
         $this->level = $level;
-        $arenaFileData = $plugin->getArenaFile($level->getFolderName());
-        $this->data = $arenaFileData->getAll(\false);
+        $arenaFileConfig = $plugin->getArenaFile($level->getFolderName());
+        $this->data = $arenaFileConfig->getAll(\false);
     }
 
     public function setMaxPlayers(int $maxPlayers)

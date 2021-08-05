@@ -69,7 +69,7 @@ class SurvivalGames extends PluginBase implements Listener
 	foreach(glob($this->getDataFolder()."arenas/*.yml") as $arenasFile){
 	     $arenaName = basename($arenaFile, ".yml");
 	     if(!isset($this->arenas[$arenaName])){
-		 $this->arenas[$arenaName] = new SG($)÷1
+		 $this->arenas[$arenaName] = new SG($this, $this->getServer()->getLevelByName($arenaName));
 	     }
 	}
         $this->getServer()->getPluginManager()->registerEvents($this, $this);

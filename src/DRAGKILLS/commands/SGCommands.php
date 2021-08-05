@@ -64,12 +64,28 @@ class SGCommands extends PluginCommand
     public function execute(CommandSender $sender, string $commandLabel, array $args)
     {
         if(!isset($args[0])){
-            $sender->sendMessage("do /{$commandLabel} help for get list off commands");
+            $sender->sendMessage("do /{$commandLabel} help to get all list off commands");
             return;
         }
         if(!$sender->hasPermission("sg.admin")){
             $sender->sendMessage("§cYou dont have permission to use this command");
             return;
+        } else {
+            switch(strtolower($args[0]){
+                case "join";
+                    if(!isset($args[1])){
+                        $sender->sendMessage("do /{$commandLabel} join (arenaName)");
+                        return;
+                    }
+                    if(!isset($this->plugin->arenas[$args[1]]){
+                        $sender->sendMessage("arena {$args[1]} not found");
+                        return;
+                    }
+                    if($sender instanceof Player)
+                    $this->plugin->arenas[$args[1]]->joinToArena($sender);
+		    break;
+		case "quit":break;//i will make it
+            }
         }
         switch(strtolower($args[0])){
             case "help":

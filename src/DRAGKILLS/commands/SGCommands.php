@@ -68,9 +68,6 @@ class SGCommands extends PluginCommand
             return;
         }
         if(!$sender->hasPermission("sg.admin")){
-            $sender->sendMessage("§cYou dont have permission to use this command");
-            return;
-        } else {
             switch(strtolower($args[0]){
                 case "join";
                     if(!isset($args[1])){
@@ -84,10 +81,33 @@ class SGCommands extends PluginCommand
                     if($sender instanceof Player)
                     $this->plugin->arenas[$args[1]]->joinToArena($sender);
 		    break;
-		case "quit":break;//i will make it
+		case "quit":
+		     if($sender instanceof Player)
+		     $this->plugin->getPlayerArena($sender)->leaveFromArena($sender);
+		     break;
+		default:
+		    $sender->sendMessage("§cYou dont have permission to use this command");
+		    break;
             }
+            return;
         }
         switch(strtolower($args[0])){
+	case "join";
+            if(!isset($args[1])){
+                $sender->sendMessage("do /{$commandLabel} join (arenaName)");
+                return;
+            }
+            if(!isset($this->plugin->arenas[$args[1]]){
+                $sender->sendMessage("arena {$args[1]} not found");
+                return;
+            }
+            if($sender instanceof Player)
+            $this->plugin->arenas[$args[1]]->joinToArena($sender);
+	    break;
+	case "quit":
+	    if($sender instanceof Player)
+            $this->plugin->getPlayerArena($sender)->leaveFromArena($sender);
+	   	break; 
             case "help":
                 $sender->sendMessage("SurvivalGames command:\n/{$commandLabel} help : get list of commands\n/{$commandLabel} create : create new SurvivalGames arena\n/{$commandLabel} delete : delete SurvivalGames arena\n/{$commandLabel} set : setup SurvivalGames arena\n/{$commandLabel} about");
                 break;

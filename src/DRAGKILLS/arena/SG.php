@@ -65,6 +65,7 @@ class SG implements Listener
         $this->level = $level;
         $arenaFileConfig = $plugin->getArenaFile($level->getFolderName());
         $this->data = $arenaFileConfig->getAll(\false);
+	$plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
     }
 
     public function setMaxPlayers(int $maxPlayers)

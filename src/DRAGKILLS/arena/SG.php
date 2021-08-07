@@ -36,8 +36,11 @@ namespace DRAGKILLS\arena;
 
 
 use DRAGKILLS\SurvivalGames;
+use DRAGKILLS\tasks\GameTask;
+use DRAGKILLS\tasks\SignUpdateTask;
 use pocketmine\event\Listener;
 use pocketmine\level\Level;
+use pocketmine\Player;
 
 /**
  * Class SG
@@ -55,9 +58,29 @@ class SG implements Listener
      */
     public $level;
     /**
-     * @var string[]
+     * @var array|string[]
      */
     public $data;
+    /**
+     * @var Player $players
+     */
+    public $players = [];
+
+    public $phase;
+
+    const GAME_LOBBY = 1;
+    const GAME_STARING = 2;
+    const GAME_RESTARTING = 3;
+    const GAME_PVP = 4;
+    const GAME_STARTED = 5;
+    /**
+     * @var SignUpdateTask
+     */
+    public $signTask;
+    /**
+     * @var GameTask
+     */
+    public $gameTask;
 
     public function __construct(SurvivalGames $plugin, Level $level)
     {
@@ -65,11 +88,27 @@ class SG implements Listener
         $this->level = $level;
         $arenaFileConfig = $plugin->getArenaFile($level->getFolderName());
         $this->data = $arenaFileConfig->getAll(\false);
-	$plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
+	    $plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
+	    $plugin->getScheduler()->scheduleRepeatingTask(new SignUpdateTask($this), 20);
+	    $plugin->getScheduler()->scheduleRepeatingTask(new GameTask($this), 20);
+	    $this->phase = 0;
     }
 
     public function setMaxPlayers(int $maxPlayers)
     {
         $this->data["maxplayers"] = $maxPlayers;
+    }
+
+    public function setSpawn(int $message, Player $player)
+    {
+        if($this->data["maxplayers"] < $message){
+            $player->sendMessage("spawns need to be like maxplayers");
+            return;
+        }
+        $this->data["spawn-{$message}"] = [
+            "x" => $player->getX(),
+            "y" => $player->getY(),
+            "x" => $player->getZ()
+        ];
     }
 }

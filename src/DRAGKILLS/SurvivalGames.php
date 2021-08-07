@@ -37,8 +37,11 @@ namespace DRAGKILLS;
 
 use DRAGKILLS\arena\SG;
 use DRAGKILLS\commands\SGCommands;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
+use pocketmine\item\Sign;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 use pocketmine\plugin\PluginBase;
@@ -56,6 +59,8 @@ class SurvivalGames extends PluginBase implements Listener
 
     /** @var SG[] $editors */
     public $editors = [];
+
+    public $set = [];
 
     public function onEnable(): void
     {
@@ -107,7 +112,7 @@ class SurvivalGames extends PluginBase implements Listener
         $event->setCancelled(true);
         switch($message){
             case "/.help":
-                $player->sendMessage("SurvivalGames SetUP:\n/.mode <team : solo>\n/.maxplayers <num, [max players]>/.done\n/.spawn <num, 1,2,3...>\n>");
+                $player->sendMessage("SurvivalGames SetUP:\n/.mode <team : solo>\n/.joinsign : addd join sign\n/.maxplayers <num, [max players]>/.done\n/.spawn <num, 1,2,3...>\n>");
                 break;
             case "/.mode":
                 echo "not now";
@@ -115,10 +120,55 @@ class SurvivalGames extends PluginBase implements Listener
             case "/.maxplayers":
                 if(is_numeric($message[1])){
                     $this->editors[$player->getName()]->setMaxPlayers($message[1]);
+                    $player->sendMessage("max player set to {$message[1]}");
                 } else {
                     $player->sendMessage("type numeric");
                 }
                 break;
+            case "/.spawn":
+                if(!is_numeric($message[1])){
+                    $player->sendMessage("{$message[1]} is not numeric");
+                    return false;
+                }
+                $this->editors[$player->getName()]->setSpawn($message[1], $player);
+                $player->sendMessage("added spawn {$message[1]}");
+                break;
+            case "/.done":
+                if(!isset($this->editors[$player->getName()]->data["maxplayers"])){
+                    $player->sendMessage("setup maxplayers first");
+                    return false;
+                }
+                unset($this->editors[$player->getName()]);
+                $player->sendMessage("setup completed\n");
+                break;
+            case "/.joinsign":
+                $this->set[$player->getName()] = 1;
+                $player->sendMessage('Break block to set join sign');
+                break;
+        }
+    }
+
+    public function onBreak(BlockBreakEvent $event)
+    {
+        $player = $event->getPlayer();
+        if(isset($this->set[$player->getName()])){
+            switch ($this->set){
+                case 0:
+                    $event->setCancelled(true);
+                    if($event->getBlock() instanceof Sign){
+                        $this->editors[$player->getName()]->data["joinsign"] = [
+                            "x" => $event->getBlock()->getX(),
+                            "y" => $event->getBlock()->getY(),
+                            "z" => $event->getBlock()->getZ(),
+                            "Arena" => $this->editors[$player->getName()]->level->getFolderName()
+                        ];
+                        unset($this->set[$player->getName()]);
+                        $player->sendMessage('join sign added');
+                    } else {
+                        $player->sendMessage('This is not sign try in sign');
+                    }
+                    break;
+            }
         }
     }
 }

@@ -67,7 +67,7 @@ class SurvivalGames extends PluginBase implements Listener
 	    @mkdir($this->getDataFolder()."maps");
 	}
 	foreach(glob($this->getDataFolder()."arenas/*.yml") as $arenasFile){
-	     $arenaName = basename($arenaFile, ".yml");
+	     $arenaName = basename($arenasFile, ".yml");
 	     if(!isset($this->arenas[$arenaName])){
 		 $this->arenas[$arenaName] = new SG($this, $this->getServer()->getLevelByName($arenaName));
 	     }
@@ -77,6 +77,10 @@ class SurvivalGames extends PluginBase implements Listener
         $this->getLogger()->alert("Enabled By DRAGKILLS");
     }
 
+    /**
+     * @param Player $player
+     * @param $arena
+     */
     public function set(Player $player, $arena): void
     {
         $this->editors[$player->getName()] = $this->arenas[$arena];

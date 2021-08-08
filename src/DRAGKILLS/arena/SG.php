@@ -73,10 +73,10 @@ class SG implements Listener
     const GAME_RESTARTING = 3;
     const GAME_PVP = 4;
     const GAME_STARTED = 5;
-    /**
-     * @var SignUpdateTask
-     */
-    public $signTask;
+    const TYPE_TITLE = 404;
+    const TYPE_MESSAGE = 504;
+    const TYPE_TIP = 403;
+    const TYPE_POPUP = 100;
     /**
      * @var GameTask
      */
@@ -90,7 +90,7 @@ class SG implements Listener
         $this->data = $arenaFileConfig->getAll(\false);
 	    $plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
 	    $plugin->getScheduler()->scheduleRepeatingTask(new SignUpdateTask($this), 20);
-	    $plugin->getScheduler()->scheduleRepeatingTask(new GameTask($this), 20);
+	    $plugin->getScheduler()->scheduleRepeatingTask($this->gameTask = new GameTask($this), 20);
 	    $this->phase = 0;
     }
 
@@ -110,5 +110,90 @@ class SG implements Listener
             "y" => $player->getY(),
             "x" => $player->getZ()
         ];
+    }
+
+    public function joinToArena(Player $player)
+    {
+        if($this->isPlaying($player)){
+            $player->sendMessage("You already in arena");
+            return;
+        }
+        if(!count($this->players) <= $this->data["maxplayers"]){
+            $player->sendMessage("Arena is full");
+            return;
+        }
+        if($this->phase == self::GAME_STARTED || $this->phase == self::GAME_RESTARTING || $this->phase == self::GAME_PVP){
+            $player->sendMessage("Game is started");
+            return;
+        }
+        $player->getInventory()->clearAll();
+        $player->getArmorInventory()->clearAll();
+        $player->getCursorInventory()->clearAll();
+        $player->setFireTicks(0);
+        $player->setBreathing(true);
+        $player->setGamemode(2);
+        $player->setImmobile(true);
+        $this->broadcast("{$player->getName()} joined! [" . count($this->players) . "/" . $this->data["maxplayers"] . "]");
+        $this->players[$player->getName()] = $player;
+        $this->phase = self::GAME_LOBBY;
+    }
+
+    public function leaveFromArena(Player $player){
+        if(!$this->isPlaying($player))return;
+        if ($this->phase == self::GAME_STARTED || $this->phase == self::GAME_RESTARTING || $this->phase == self::GAME_PVP)return;
+        $player->getInventory()->clearAll();
+        $player->getArmorInventory()->clearAll();
+        $player->getCursorInventory()->clearAll();
+        $player->setFireTicks(0);
+        $player->setBreathing(true);
+        $player->setGamemode($this->plugin->getServer()->getDefaultGamemode());
+        $player->setImmobile(false);
+        $this->broadcast("{$player->getName()} leave! [" . count($this->players) . "/" . $this->data["maxplayers"] . "]");
+        unset($this->players[$player->getName()]);
+        if(count($this->players) < $this->data["maxplayers"]){
+            $this->gameTask->resetTime();
+        }
+    }
+
+    public function isPlaying(Player $player): bool
+    {
+        return isset($this->players[$player->getName()]);
+    }
+
+    public function startGame()
+    {
+        foreach ($this->players as $player){
+            $player->setImmobile(false);
+        }
+        $this->broadcast("Game Started!", self::TYPE_TITLE);
+        $this->phase = self::GAME_STARTED;
+    }
+
+    public function broadcast(string $message, int $type = self::TYPE_MESSAGE){
+        switch ($type){
+            case self::TYPE_MESSAGE:
+                foreach ($this->players as $player){
+                    $player->sendMessage($message);
+                }
+                break;
+            case self::TYPE_TITLE:
+                foreach ($this->players as $player){
+                    $player->addTitle($message);
+                }
+                break;
+            case self::TYPE_POPUP:
+                foreach ($this->players as $player){
+                    $player->sendPopup($message);
+                }
+                break;
+            case self::TYPE_TIP:
+                foreach ($this->players as $player){
+                    $player->sendTip($message);
+                }
+                break;
+            default:
+                $this->plugin->getLogger()->error("UNKNOWN MESSAGE TYPE");
+                break;
+        }
     }
 }

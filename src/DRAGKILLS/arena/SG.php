@@ -88,10 +88,10 @@ class SG implements Listener
         $this->level = $level;
         $arenaFileConfig = $plugin->getArenaFile($level->getFolderName());
         $this->data = $arenaFileConfig->getAll(\false);
-	$plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
-	$plugin->getScheduler()->scheduleRepeatingTask(new SignUpdateTask($this), 20);
-	$plugin->getScheduler()->scheduleRepeatingTask($this->gameTask = new GameTask($this), 20);
-	$this->phase = 0;
+	    $plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
+	    $plugin->getScheduler()->scheduleRepeatingTask(new SignUpdateTask($this), 20);
+	    $plugin->getScheduler()->scheduleRepeatingTask($this->gameTask = new GameTask($this), 20);
+	    $this->phase = 0;
     }
 
     public function setMaxPlayers(int $maxPlayers)

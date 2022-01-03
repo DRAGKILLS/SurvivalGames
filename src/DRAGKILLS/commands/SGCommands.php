@@ -129,7 +129,7 @@ class SGCommands extends PluginCommand
                         return;
                     }
                     $level = $this->plugin->getServer()->getLevelByName($args[1]);
-                    $this->plugin->arenas[$args[1]] = new SG($this->plugin, $level, []);
+                    $this->plugin->arenas[$args[1]] = new SG($this->plugin, $level);
                 } else {
                     $sender->sendMessage("Only IN_GAME");
                 }

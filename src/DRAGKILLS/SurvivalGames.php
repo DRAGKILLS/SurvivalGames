@@ -7,7 +7,7 @@
  * | |_| |  _ <  / ___ \ |_| | . \ | || |___| |___ ___) |
  * |____/|_| \_\/_/   \_\____|_|\_\___|_____|_____|____/
  *
- * Copyright 2019/2021 DRAGKILLS
+ * Copyright 2019/2022 DRAGKILLS
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ class SurvivalGames extends PluginBase implements Listener
     /** @var SG[] $editors */
     public $editors = [];
 
-    public $set = [];
+    public $setup = [];
 
     public function onEnable(): void
     {
@@ -78,7 +78,7 @@ class SurvivalGames extends PluginBase implements Listener
 	     }
 	}
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
-        $this->getServer()->getCommandMap()->register("SG_v1", new SGCommands($this));
+        $this->getServer()->getCommandMap()->register("SurvivalGames_v1", new SGCommands($this));
         $this->getLogger()->alert("Enabled By DRAGKILLS");
     }
 
@@ -89,7 +89,7 @@ class SurvivalGames extends PluginBase implements Listener
     public function set(Player $player, $arena): void
     {
         $this->editors[$player->getName()] = $this->arenas[$arena];
-        $player->sendMessage("You are now in setup mode\ntype /.help to get list of help");
+        $player->sendMessage("§aYou are now in setup mode\n§6type help to get list of help");
     }
 
     public function getArenaFile($path): Config
@@ -99,7 +99,7 @@ class SurvivalGames extends PluginBase implements Listener
 
     public function getPlayerArena(Player $player): SG
     {
-	return $this->arenas[$player->getLevel()->getFolderName()];
+	return isset($this->arenas[$player->getLevel()->getFolderName()]) ? $this->arenas[$player->getLevel()->getFolderName()] : null;
     }
 
     public function onChat(PlayerChatEvent $event)
@@ -111,13 +111,13 @@ class SurvivalGames extends PluginBase implements Listener
         }
         $event->setCancelled(true);
         switch($message){
-            case "/.help":
-                $player->sendMessage("SurvivalGames SetUP:\n/.mode <team : solo>\n/.joinsign : addd join sign\n/.maxplayers <num, [max players]>/.done\n/.spawn <num, 1,2,3...>\n>");
+            case "help":
+                $player->sendMessage("SurvivalGames Setup Commands:\nmode <team : solo>\njoinsign : addd join sign\nmaxplayers <int, [max players]>\nspawn <int, 1,2,3...>\n>\ndone : finish setup");
                 break;
-            case "/.mode":
+            case "mode":
                 echo "not now";
                 break;
-            case "/.maxplayers":
+            case "maxplayers":
                 if(is_numeric($message[1])){
                     $this->editors[$player->getName()]->setMaxPlayers($message[1]);
                     $player->sendMessage("max player set to {$message[1]}");
@@ -125,7 +125,7 @@ class SurvivalGames extends PluginBase implements Listener
                     $player->sendMessage("type numeric");
                 }
                 break;
-            case "/.spawn":
+            case "spawn":
                 if(!is_numeric($message[1])){
                     $player->sendMessage("{$message[1]} is not numeric");
                     return false;
@@ -133,7 +133,7 @@ class SurvivalGames extends PluginBase implements Listener
                 $this->editors[$player->getName()]->setSpawn($message[1], $player);
                 $player->sendMessage("added spawn {$message[1]}");
                 break;
-            case "/.done":
+            case "done":
                 if(!isset($this->editors[$player->getName()]->data["maxplayers"])){
                     $player->sendMessage("setup maxplayers first");
                     return false;
@@ -141,8 +141,8 @@ class SurvivalGames extends PluginBase implements Listener
                 unset($this->editors[$player->getName()]);
                 $player->sendMessage("setup completed\n");
                 break;
-            case "/.joinsign":
-                $this->set[$player->getName()] = 1;
+            case "joinsign":
+                $this->setup[$player->getName()] = 1;
                 $player->sendMessage('Break block to set join sign');
                 break;
         }
@@ -151,9 +151,9 @@ class SurvivalGames extends PluginBase implements Listener
     public function onBreak(BlockBreakEvent $event)
     {
         $player = $event->getPlayer();
-        if(isset($this->set[$player->getName()])){
+        if(isset($this->setup[$player->getName()])){
             switch ($this->set){
-                case 0:
+                case 1:
                     $event->setCancelled(true);
                     if($event->getBlock() instanceof Sign){
                         $this->editors[$player->getName()]->data["joinsign"] = [
@@ -162,7 +162,7 @@ class SurvivalGames extends PluginBase implements Listener
                             "z" => $event->getBlock()->getZ(),
                             "Arena" => $this->editors[$player->getName()]->level->getFolderName()
                         ];
-                        unset($this->set[$player->getName()]);
+                        unset($this->setup[$player->getName()]);
                         $player->sendMessage('join sign added');
                     } else {
                         $player->sendMessage('This is not sign try in sign');

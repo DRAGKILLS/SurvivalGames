@@ -7,4 +7,4 @@ authors: [DRAGKILLS]
 permissions:
   sg.admin:
     default: op
-    description: Allow Player to create/edit SurvivalGames arena
+    description: Allow player to edit SurvivalGames arena

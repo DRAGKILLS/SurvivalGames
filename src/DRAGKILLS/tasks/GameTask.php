@@ -49,6 +49,8 @@ class GameTask extends Task
      */
     public $plugin;
 
+    public $startTime = 30;
+
     /**
      * @param SG $plugin
      */
@@ -63,5 +65,10 @@ class GameTask extends Task
     public function onRun(int $currentTick)
     {
 
+    }
+
+    public function resetTimer()
+    {
+	$this->startTime = 30;
     }
 }

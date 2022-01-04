@@ -1,10 +1,10 @@
 # SurvivalGames
 SurvivalGames plugin pocketmine 3
 ### TODO:
-make arena join and quit : done
+[x] make arena join and quit
 
-make it good
+[x] make it good
 
-better setup
+[x] better setup
 
-multi langs
+[] multi lang

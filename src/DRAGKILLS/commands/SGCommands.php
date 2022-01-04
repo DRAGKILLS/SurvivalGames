@@ -64,26 +64,24 @@ class SGCommands extends PluginCommand
     public function execute(CommandSender $sender, string $commandLabel, array $args)
     {
         if(!isset($args[0])){
-            $sender->sendMessage("do /{$commandLabel} help to get all list off commands");
+            $sender->sendMessage("Usage: /{$commandLabel} help to get all list off commands");
             return;
         }
         if(!$sender->hasPermission("sg.admin")){
             switch(strtolower($args[0])){
                 case "join":
                     if(!isset($args[1])){
-                        $sender->sendMessage("do /{$commandLabel} join (arenaName)");
+                        $sender->sendMessage("Usage: /{$commandLabel} join (arenaName)");
                         return;
                     }
                     if(!isset($this->plugin->arenas[$args[1]])){
                         $sender->sendMessage("arena {$args[1]} not found");
                         return;
                     }
-                    if($sender instanceof Player)
-                        $this->plugin->arenas[$args[1]]->joinToArena($sender);
+                    if($sender instanceof Player)$this->plugin->arenas[$args[1]]->joinToArena($sender);
                     break;
                 case "quit":
-                    if($sender instanceof Player)
-                        $this->plugin->getPlayerArena($sender)->leaveFromArena($sender);
+                    if($sender instanceof Player)$this->plugin->getPlayerArena($sender->getLevel()->getFolderName())->leaveFromArena($sender);
                     break;
                 default:
                     $sender->sendMessage("§cYou dont have permission to use this command");
@@ -109,14 +107,14 @@ class SGCommands extends PluginCommand
                     $this->plugin->getPlayerArena($sender)->leaveFromArena($sender);
                 break;
             case "help":
-                $sender->sendMessage("SurvivalGames command:\n/{$commandLabel} help : get list of commands\n/{$commandLabel} create : create new SurvivalGames arena\n/{$commandLabel} delete : delete SurvivalGames arena\n/{$commandLabel} set : setup SurvivalGames arena\n/{$commandLabel} about");
+                $sender->sendMessage("SurvivalGames Command:\n/{$commandLabel} help : get list of commands\n/{$commandLabel} create : create new SurvivalGames arena\n/{$commandLabel} remove : delete SurvivalGames arena\n/{$commandLabel} set : setup SurvivalGames arena\n/{$commandLabel} about");
                 break;
             case "about":
                 $sender->sendMessage("By DRAGKILLS\ngithub : https://github.com/DRAGKILLS\nDiscord : DRAGKILLS#0830\nDiscord Server : https://discord.gg/ab9qEQmCya");
                 break;
             case "create":
                 if($sender instanceof Player){
-                    if(!isset($args[1])){
+                    if(!isset($args[1]) || trim($args[1]) == ""){
                         $sender->sendMessage("you dont type arena name!");
                         return;
                     }
@@ -131,19 +129,17 @@ class SGCommands extends PluginCommand
                     $level = $this->plugin->getServer()->getLevelByName($args[1]);
                     $this->plugin->arenas[$args[1]] = new SG($this->plugin, $level);
                 } else {
-                    $sender->sendMessage("Only IN_GAME");
+                    $sender->sendMessage("Only In game");
                 }
                 break;
-            case "delete":
             case "remove":
-            case "rm":
                 if($sender instanceof Player){
-                    if(!isset($args[1])){
+                    if(!isset($args[1]) || trim($args[1]) == ""){
                         $sender->sendMessage("you dont type arena name!");
                         return;
                     }
                     if(!isset($this->plugin->arenas[$args[1]])) {
-                        $sender->sendMessage("arena {$args[1]} is not arena!");
+                        $sender->sendMessage("{$args[1]} is not a arena!");
                         return;
                     }
                     unset($this->plugin->arenas[$args[1]]);
@@ -156,16 +152,16 @@ class SGCommands extends PluginCommand
             case "set":
                 if($sender instanceof Player){
                     if(!isset($args[1])){
-                        $sender->sendMessage("do /{$commandLabel} set (arena)}");
+                        $sender->sendMessage("Usage: /{$commandLabel} set (arena)}");
                         return;
                     }
                     $this->plugin->set($sender, $args[1]);
                 } else {
-                    $sender->sendMessage("Only IN_GAME");
+                    $sender->sendMessage("Only In game");
                 }
                 break;
             default:
-                $sender->sendMessage("do /{$commandLabel} help for get list off commands");
+                $sender->sendMessage("Usage: /{$commandLabel} help for get list off commands");
                 break;
         }
     }

@@ -68,15 +68,15 @@ class SG implements Listener
 
     public $phase;
 
-    const GAME_LOBBY = 1;
-    const GAME_STARING = 2;
-    const GAME_RESTARTING = 3;
-    const GAME_PVP = 4;
-    const GAME_STARTED = 5;
-    const TYPE_TITLE = 404;
-    const TYPE_MESSAGE = 504;
-    const TYPE_TIP = 403;
-    const TYPE_POPUP = 100;
+    public const GAME_LOBBY = 1;
+    public const GAME_STARING = 2;
+    public const GAME_RESTARTING = 3;
+    public const GAME_PVP = 4;
+    public const GAME_STARTED = 5;
+    public const TYPE_TITLE = 6;
+    public const TYPE_MESSAGE = 7;
+    public const TYPE_TIP = 8;
+    public const TYPE_POPUP = 9;
     /**
      * @var GameTask
      */
@@ -99,9 +99,9 @@ class SG implements Listener
         $this->data["maxplayers"] = $maxPlayers;
     }
 
-    public function setSpawn(int $message, Player $player)
+    public function setSpawn(int $num, Player $player)
     {
-        if($this->data["maxplayers"] < $message){
+        if($this->data["maxplayers"] < $num){
             $player->sendMessage("spawns need to be like maxplayers");
             return;
         }
@@ -130,9 +130,8 @@ class SG implements Listener
         $player->getArmorInventory()->clearAll();
         $player->getCursorInventory()->clearAll();
         $player->setFireTicks(0);
-        $player->setBreathing(true);
         $player->setGamemode(2);
-        $player->setImmobile(true);
+        $player->setImmobile();
         $this->broadcast("{$player->getName()} joined! [" . count($this->players) . "/" . $this->data["maxplayers"] . "]");
         $this->players[$player->getName()] = $player;
         $this->phase = self::GAME_LOBBY;
@@ -145,7 +144,6 @@ class SG implements Listener
         $player->getArmorInventory()->clearAll();
         $player->getCursorInventory()->clearAll();
         $player->setFireTicks(0);
-        $player->setBreathing(true);
         $player->setGamemode($this->plugin->getServer()->getDefaultGamemode());
         $player->setImmobile(false);
         $this->broadcast("{$player->getName()} leave! [" . count($this->players) . "/" . $this->data["maxplayers"] . "]");
@@ -165,7 +163,7 @@ class SG implements Listener
         foreach ($this->players as $player){
             $player->setImmobile(false);
         }
-        $this->broadcast("Game Started!", self::TYPE_TITLE);
+        $this->broadcast("§aGame Started!", self::TYPE_TITLE);
         $this->phase = self::GAME_STARTED;
     }
 
